@@ -15,6 +15,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (!authResult.user) {
+            return NextResponse.json(
+                { success: false, message: "User not found" },
+                { status: 401 }
+            );
+        }
+
         // Authorization check
         const roleResult = requireRole(authResult.user, ['admin', 'reviewer']);
         if (!roleResult.success) {
@@ -67,7 +74,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate sequential review ID
-        let newReviewId;
+        let newReviewId = '';
         let reviewNumber = 1;
         let idExists = true;
 
@@ -93,12 +100,12 @@ export async function POST(request: NextRequest) {
             id: newReviewId,
             bookId,
             author,
-            rating: parseInt(rating),
+            rating: rating,
             title,
             comment,
             timestamp: new Date().toISOString(),
             verified: Boolean(verified),
-            submittedBy: authResult.user.username
+            submittedBy: authResult.user?.username
         };
 
         // Note: In a real application, you would save to a database here
@@ -107,7 +114,7 @@ export async function POST(request: NextRequest) {
             success: true,
             message: 'Review added successfully',
             data: newReview,
-            submittedBy: authResult.user.username,
+            submittedBy: authResult.user?.username,
             note: 'In a production environment, this review would be saved to the database'
         }, { status: 201 });
 
