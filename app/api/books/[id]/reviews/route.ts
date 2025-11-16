@@ -5,26 +5,26 @@ import reviewsData from '@/app/data/reviews.json';
 // GET /api/books/[id]/reviews - Get reviews for a specific book
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookId = params.id;
+    const {id} = await params;
     const { searchParams } = new URL(request.url);
     const sort = searchParams.get('sort') || 'date_desc';
     const verified = searchParams.get('verified');
     const rating = searchParams.get('rating');
 
     // Check if book exists
-    const book = booksData.books.find(b => b.id === bookId);
+    const book = booksData.books.find(b => b.id === id);
     if (!book) {
       return NextResponse.json(
-        { success: false, message: `Book not found with ID: ${bookId}` },
+        { success: false, message: `Book not found with ID: ${id}` },
         { status: 404 }
       );
     }
 
     // Get reviews for this book
-    let bookReviews = reviewsData.reviews.filter(review => review.bookId === bookId);
+    let bookReviews = reviewsData.reviews.filter(review => review.bookId === id);
 
     // Apply filters
     if (verified === 'true') {

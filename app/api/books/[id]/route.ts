@@ -4,17 +4,17 @@ import booksData from '@/app/data/books.json';
 // GET /api/books/[id] - Get single book by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookId = params.id;
-    const book = booksData.books.find(b => b.id === bookId);
+    const { id } = await params;
+    const book = booksData.books.find(b => b.id === id);
 
     if (!book) {
       return NextResponse.json(
         {
           success: false,
-          message: `Book not found with ID: ${bookId}`,
+          message: `Book not found with ID: ${id}`,
           suggestedIds: booksData.books.map(b => b.id)
         },
         { status: 404 }
