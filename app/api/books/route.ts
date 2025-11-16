@@ -54,6 +54,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (!authResult.user) {
+            return NextResponse.json(
+                { success: false, message: "User not found" },
+                { status: 401 }
+            );
+        }
+
         // Authorization check
         const roleResult = requireRole(authResult.user, ['admin', 'publisher']);
         if (!roleResult.success) {
@@ -133,7 +140,7 @@ export async function POST(request: NextRequest) {
             inStock: Boolean(inStock),
             featured: Boolean(featured),
             createdAt: new Date().toISOString(),
-            createdBy: authResult.user.username
+            createdBy: authResult.user?.username
         };
 
         // Note: In a real application, you would save to a database here
@@ -143,7 +150,7 @@ export async function POST(request: NextRequest) {
             success: true,
             message: 'Book added successfully',
             data: newBook,
-            addedBy: authResult.user.username,
+            addedBy: authResult.user?.username,
             note: 'In a production environment, this book would be saved to the database'
         }, { status: 201 });
 
